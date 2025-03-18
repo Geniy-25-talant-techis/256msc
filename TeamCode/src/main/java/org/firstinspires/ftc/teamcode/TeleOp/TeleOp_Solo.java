@@ -17,7 +17,7 @@ public class TeleOp_Solo extends OpMode {
 
 
     public void init(){
-        i.teleInit(hardwareMap);
+        i.init_hwm_tele(hardwareMap);
         i.Clash.setDirection(Servo.Direction.REVERSE);
         double ask = i.Clash.getPosition();
         telemetry.addData("PositionClash",ask);

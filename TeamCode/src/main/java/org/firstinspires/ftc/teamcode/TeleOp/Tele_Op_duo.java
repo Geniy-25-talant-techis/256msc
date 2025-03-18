@@ -17,9 +17,8 @@ Initilization i = new Initilization();
     public static int zero = 0;
     public static int Low = 0;
 
-
     public void init(){
-        i.teleInit(hardwareMap);
+        i.init_hwm_tele(hardwareMap);
         i.Clash.setDirection(Servo.Direction.REVERSE);
         double ask = i.Clash.getPosition();
         telemetry.addData("PositionClash",ask);
@@ -28,7 +27,6 @@ Initilization i = new Initilization();
         telemetry.update();
     }
     public void loop(){
-        boolean revers =false;
         boolean Max = false;
         if(i.Max_Static.getState()==false&&i.Max_Drive.getState()==false){
             Max = true;
@@ -75,12 +73,12 @@ Initilization i = new Initilization();
 if(i.Low_Drive.getState()==true){
     i.Lift_TS.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
     i.Lift_TS.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-    revers = false;
+    i.revers = false;
 }
 if(i.Max_Static.getState()==true&&i.Max_Drive.getState()==true){
     i.Lift_TS.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
     i.Lift_TS.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-    revers = true;
+    i.revers = true;
 }
 
         if(gamepad2.dpad_left&&i.Low_Drive.getState()==false){

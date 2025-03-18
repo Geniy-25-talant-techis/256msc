@@ -15,21 +15,11 @@ public class Auto_A45 extends LinearOpMode {
         BNO055IMU imu;
 
         Initilization i = new Initilization();
-        i.autoinit(hardwareMap);
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample OpMode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        i.autoinit(hardwareMap);
+        i.init_hwm_tele(hardwareMap);
+        i.init_hwm_auto(hardwareMap);
 
 
         ElapsedTime timer = new ElapsedTime();
-        while (!imu.isGyroCalibrated()){
-        }
         telemetry.addData("Auto","Ready");
         waitForStart();
         timer.reset();
