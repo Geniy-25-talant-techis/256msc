@@ -4,9 +4,7 @@ package org.firstinspires.ftc.teamcode.ModuleInit;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -15,8 +13,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 @Config
 public class Initilization {
@@ -60,6 +56,8 @@ public class Initilization {
         Low_Drive.setMode(DigitalChannel.Mode.INPUT);
         Max_Drive.setMode(DigitalChannel.Mode.INPUT);
 
+        Lift_TS.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         LeftFrotnDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -78,6 +76,7 @@ public class Initilization {
         Lift_TS.setDirection(DcMotorSimple.Direction.REVERSE);
         Lift_Moment.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         Lift_TS.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+
 
     }
 
@@ -110,7 +109,7 @@ public class Initilization {
     }
 
 
-    public enum Lift_TS {
+    public enum LiftTSMods {
         Low,
         maxx,
         midle,
@@ -120,7 +119,8 @@ public class Initilization {
         BORT
     }
 
-    public Lift_TS Lift_Control_TS;
+
+    public LiftTSMods LiftTSMode;
     public int start_pos_Lift_moment = 0;
     public int start_pow_Lift_TS = 0;
     public static int up = 308;
@@ -135,13 +135,15 @@ public class Initilization {
     public double Speed_Up = 0.2;
     public double Speed_Low = -0.2;
 
-    public Thread Lift_auto_Ts = new Thread() { //поток для управления стрелой
+    public Thread Lift_auto_Ts = new Thread() {//поток для управления стрелой
+        @Override
         public void run() {
             double error;
             start_pow_Lift_TS = Lift_TS.getCurrentPosition();
-            Lift_TS.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             while (!l.isStopRequested()) {
-                switch (Lift_Control_TS) {
+                switch (LiftTSMode) {
+                    default:
+                        break;
                     case stop:
                         Lift_TS.setPower(0);
                         break;
@@ -151,7 +153,7 @@ public class Initilization {
                             }
                         Lift_TS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         Lift_TS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                                Lift_Control_TS = Lift_Control_TS.stop;
+                                LiftTSMode = Initilization.LiftTSMods.stop;
                                 revers = false;
                                 break;
                     case maxx:
@@ -160,7 +162,7 @@ public class Initilization {
                             }
                         Lift_TS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         Lift_TS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                        Lift_Control_TS = Lift_Control_TS.stop;
+                        LiftTSMode = Initilization.LiftTSMods.stop;
                         revers = true;
                         break;
                     case midle:
@@ -172,8 +174,10 @@ public class Initilization {
                         }
                         Lift_TS.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         Lift_TS.setPower(Speed_Up);
-                        while(Lift_TS.isBusy());
-                        Lift_Control_TS = Lift_Control_TS.stop;
+                        while(Lift_TS.isBusy()){
+
+                        }
+                        LiftTSMode = Initilization.LiftTSMods.stop;
                         break;
                     case BORT:
                         if (revers){
@@ -185,8 +189,10 @@ public class Initilization {
                         }
                         Lift_TS.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         Lift_TS.setPower(Speed_Up);
-                        while(Lift_TS.isBusy());
-                        Lift_Control_TS = Lift_Control_TS.stop;
+                        while(Lift_TS.isBusy()){
+
+                        }
+                        LiftTSMode = Initilization.LiftTSMods.stop;
                         break;
 
 

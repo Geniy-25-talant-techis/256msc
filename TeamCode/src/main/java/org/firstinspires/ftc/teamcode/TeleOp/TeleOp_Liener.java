@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.ModuleInit.Initilization;
@@ -16,11 +15,13 @@ i.init_hwm_tele(hardwareMap,this);
 
 
 i.Lift_auto_Ts.start();
+i.LiftTSMode = Initilization.LiftTSMods.stop;
+
     while(!isStopRequested()){
 
         if(i.Max_Static.getState()==false&&i.Max_Drive.getState()==false){
             i.Max = true;
-            
+
         }else{
             i.Max = false;
         }
@@ -50,11 +51,9 @@ i.Lift_auto_Ts.start();
         i.leftBackDrive.setPower(leftBackPower);
         i.RightBackDrive.setPower(rightBackPower*0.7);
 if(gamepad2.left_bumper){
-    i.Lift_Control_TS = i.Lift_Control_TS.Low;
+    i.LiftTSMode = Initilization.LiftTSMods.Low;
 } else if (gamepad2.right_bumper) {
-    i.Lift_Control_TS = i.Lift_Control_TS.maxx;
-
-
+    i.LiftTSMode = Initilization.LiftTSMods.maxx;
 }
 
 telemetry.addData("------------------Servo----------------",null);
