@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.ModuleInit;
 
+
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -16,8 +18,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
+@Config
 public class Initilization {
+
     BNO055IMU imu;
     public LinearOpMode l = null;
     public boolean Max = false;
@@ -36,11 +39,12 @@ public class Initilization {
     public String status;
     public String game = "Game";
     public Boolean revers = false;
-    public Telemetry t = null;
+
 
     ElapsedTime time = new ElapsedTime();
 
-    public void init_hwm_tele(HardwareMap hardwareMap) {
+    public void init_hwm_tele(HardwareMap hardwareMap, LinearOpMode l) {
+        this.l = l;
         LeftFrotnDrive = hardwareMap.get(DcMotor.class, "MFL");
         RightFrontDrive = hardwareMap.get(DcMotor.class, "MFR");
         leftBackDrive = hardwareMap.get(DcMotor.class, "MBL");
@@ -106,18 +110,23 @@ public class Initilization {
     }
 
 
-    public enum Lift {
-        Start,
-        High_Comp,
-        Low_Comp,
+    public enum Lift_TS {
+        Low,
+        maxx,
+        midle,
         Hand,
-        stop
+        stop,
+        HAND,
+        BORT
     }
 
-    public Lift Lift_Control;
+    public Lift_TS Lift_Control_TS;
     public int start_pos_Lift_moment = 0;
     public int start_pow_Lift_TS = 0;
     public static int up = 308;
+    public static int bort = 150;
+    public static int mid = 2725;
+
     public static int max = 5450;
     public static int zero = 0;
     public static int Low = 0;
@@ -126,69 +135,63 @@ public class Initilization {
     public double Speed_Up = 0.2;
     public double Speed_Low = -0.2;
 
-    public Thread Lift_auto = new Thread() {
+    public Thread Lift_auto_Ts = new Thread() { //поток для управления стрелой
         public void run() {
             double error;
-            int Lift_moment_max = up;
-            int Lift_moment_min = zero;
-            start_pos_Lift_moment = Lift_Moment.getCurrentPosition();
             start_pow_Lift_TS = Lift_TS.getCurrentPosition();
-
-            Lift_TS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            Lift_TS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            Lift_Moment.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            Lift_Moment.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Lift_TS.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             while (!l.isStopRequested()) {
-                switch (Lift_Control) {
+                switch (Lift_Control_TS) {
                     case stop:
                         Lift_TS.setPower(0);
-                        Lift_Moment.setPower(0);
-                        Lift_TS.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                        Lift_Moment.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                         break;
-                    case Start:
-                            while ( Low_Drive.getState() != true || Lift_Moment.getCurrentPosition() > zero) {
-                                if (Low_Drive.getState()!=true) {
-                                    Lift_TS.setPower(0);
-                                    Lift_TS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                                    Lift_TS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                                    revers = false;
-                                }else {
-                                        Lift_TS.setPower(Speed_Low);
-                                    }
-                                if(Lift_Moment.getCurrentPosition()<=zero){
-                                    Lift_Moment.setPower(0);
-                                    error = Lift_Moment.getCurrentPosition();
-                                    Lift_TS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                                    Lift_TS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                                    Lift_moment_max += error;
-                                    Lift_moment_min += error;
-
-                                }else{
-                                    Lift_Moment.setPower(Speed_Low);
-                                }
-                                Lift_Control = Lift_Control.stop;
+                    case Low:
+                            while (Low_Drive.getState() != true) {
+                                Lift_TS.setPower(Speed_Low);
+                            }
+                        Lift_TS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        Lift_TS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                                Lift_Control_TS = Lift_Control_TS.stop;
+                                revers = false;
                                 break;
-                                };
-                    case High_Comp:
-                        while(Max == false||Lift_Moment.getCurrentPosition()<Lift_moment_max){
-                            if (Max == true) {
-                                Lift_TS.setPower(0);
-                                Lift_TS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                                Lift_TS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                                revers = true;
-                            }else {
-                                Lift_TS.setPower(Speed_Up);
+                    case maxx:
+                        while(Max == false){
+                            Lift_TS.setPower(Speed_Up);
                             }
-                            if(Lift_Moment.getCurrentPosition()>=up){
-                                Lift_Moment.setPower(0);
-                                error = Lift_Moment.getCurrentPosition();
-                            }else{
-                                Lift_Moment.setPower(Speed_Up);
-                            }
-                        }
-                        Lift_Control = Lift_Control.stop;
+                        Lift_TS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        Lift_TS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Lift_Control_TS = Lift_Control_TS.stop;
+                        revers = true;
                         break;
+                    case midle:
+
+                        if(revers){
+                            Lift_TS.setTargetPosition(mid - max);
+                        }else{
+                            Lift_TS.setTargetPosition(mid);
+                        }
+                        Lift_TS.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Lift_TS.setPower(Speed_Up);
+                        while(Lift_TS.isBusy());
+                        Lift_Control_TS = Lift_Control_TS.stop;
+                        break;
+                    case BORT:
+                        if (revers){
+                            Lift_TS.setTargetPosition(bort - max);
+
+                        }
+                        else{
+                            Lift_TS.setTargetPosition(bort);
+                        }
+                        Lift_TS.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Lift_TS.setPower(Speed_Up);
+                        while(Lift_TS.isBusy());
+                        Lift_Control_TS = Lift_Control_TS.stop;
+                        break;
+
+
+
+
 
 
                         }

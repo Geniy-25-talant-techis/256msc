@@ -15,7 +15,7 @@ public class Auto_A45 extends LinearOpMode {
         BNO055IMU imu;
 
         Initilization i = new Initilization();
-        i.init_hwm_tele(hardwareMap);
+        i.init_hwm_tele(hardwareMap,i.l);
         i.init_hwm_auto(hardwareMap);
 
 

@@ -18,7 +18,7 @@ Initilization i = new Initilization();
     public static int Low = 0;
 
     public void init(){
-        i.init_hwm_tele(hardwareMap);
+        i.init_hwm_tele(hardwareMap,i.l);
         i.Clash.setDirection(Servo.Direction.REVERSE);
         double ask = i.Clash.getPosition();
         telemetry.addData("PositionClash",ask);

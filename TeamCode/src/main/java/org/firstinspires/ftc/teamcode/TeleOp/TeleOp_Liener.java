@@ -11,14 +11,13 @@ public class TeleOp_Liener extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Initilization i = new Initilization();
 
-        i.status = "Init";
-
+i.init_hwm_tele(hardwareMap,this);
         waitForStart();
 
-        i.status = "out_game";
 
+i.Lift_auto_Ts.start();
     while(!isStopRequested()){
-i.status = "Game";
+
         if(i.Max_Static.getState()==false&&i.Max_Drive.getState()==false){
             i.Max = true;
             
@@ -51,24 +50,22 @@ i.status = "Game";
         i.leftBackDrive.setPower(leftBackPower);
         i.RightBackDrive.setPower(rightBackPower*0.7);
 if(gamepad2.left_bumper){
-    i.Lift_Control = i.Lift_Control.Start;
-    i.revers = false;
+    i.Lift_Control_TS = i.Lift_Control_TS.Low;
 } else if (gamepad2.right_bumper) {
-    i.Lift_Control = i.Lift_Control.High_Comp;
-    i.revers = true;
+    i.Lift_Control_TS = i.Lift_Control_TS.maxx;
 
 
 }
-        i.t.addData("Status:",i.status);
-i.t.addData("------------------Servo----------------",null);
+
+telemetry.addData("------------------Servo----------------",null);
         telemetry.addData("PositionPovorot:",i.Pvrt.getPosition());
         telemetry.addData("PositionClash:",i.Clash.getPosition());
-        i.t.addData("------------------Lift----------------",null);
+        telemetry.addData("------------------Lift----------------",null);
         telemetry.addData("PositionLift_M",i.Lift_Moment.getTargetPosition());
         telemetry.addData("PositionLift_TS",i.Lift_TS.getTargetPosition());
-        i.t.addData("------------------TouchSensor----------------",null);
+        telemetry.addData("------------------TouchSensor----------------",null);
         telemetry.addData("Max",i.Max);
-     i.t.update();
+     telemetry.update();
 
         }
     }
